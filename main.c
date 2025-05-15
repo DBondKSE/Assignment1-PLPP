@@ -1,9 +1,6 @@
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define true 1
-#define false 0
 
 char **text;
 int row = 0;
@@ -19,7 +16,6 @@ char *readInput() {
     int current;
 
     while ((current = getchar()) != '\n' && current != EOF) {
-        //Resize buffer
         if (index + 1 > size) {
             size *= 2;
             char *temp = realloc(buffer, size);
@@ -41,7 +37,7 @@ void newLine() {
 
 void save() {
     FILE* file;
-    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {} //Flush input buffer
+    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {}
     file = fopen(readInput(), "w");
     if (file != NULL)
     {
@@ -57,7 +53,7 @@ void save() {
 void load() {
     FILE* file;
     int row_counter = 0;
-    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {} //Flush input buffer
+    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {}
     file = fopen(readInput(), "r");
     if (file == NULL)
     {
@@ -97,11 +93,11 @@ void print() {for (int i = 0; i <= row; i++) printf("%s\n\n", *(text + i));}
 void insert(const int *ROW, const int *SYMBOL) {
     if (ROW == NULL || SYMBOL == NULL) return;
 
-    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {} //Flush input buffer
+    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {}
 
     char *input = readInput();
 
-    int length = 0; while (*(input + length) != '\0') length++; //Count input length
+    int length = 0; while (*(input + length) != '\0') length++;
 
     if (*ROW == row && *SYMBOL == symbol && symbol == 0) *(text + *ROW) = malloc(length);
     else *(text + *ROW) = realloc(*(text + *ROW), memory_allocated += length);
@@ -121,13 +117,27 @@ void insert(const int *ROW, const int *SYMBOL) {
 }
 
 void search() {
+    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {}
+    char* prompt = readInput();
+    int length = 0; while (*(prompt + length) != '\0') length++;
+    for (int i = 0; i <= row; i++) {
+        char* whole = *(text + i);
+        char* found;
+
+        while ((found = strstr(whole, prompt)) != NULL) {
+            while (whole < found) putchar(*whole++);
+            printf("[>%.*s<]", length, found);
+            whole = found + length;
+        }
+        printf("%s\n", whole);
+    }
 }
 
 
 int main(void) {
     system("clear");
     text = malloc(memory_allocated);
-    while (true) {
+    while (235) {
         printf("> Choose the command ([h] - help):\n");
         char command;
         scanf(" %c", &command);
@@ -166,6 +176,7 @@ int main(void) {
                 } else printf("Invalid input, try again\n");
                 break;
             case '7':
+                printf("Enter text to search: ");
                 search();
                 break;
             default:
