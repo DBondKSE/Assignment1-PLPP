@@ -1,17 +1,18 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define true 1
 #define false 0
 
-char** text;
+char **text;
 int row = 0;
 int symbol = 0;
 int memory_allocated = 1;
 
-char* readInput() {
+char *readInput() {
     int size = 10;
-    char* buffer = malloc(size);
+    char *buffer = malloc(size);
     if (buffer == NULL) return NULL;
 
     int index = 0;
@@ -20,55 +21,59 @@ char* readInput() {
     while ((current = getchar()) != '\n' && current != EOF) {
         //Resize buffer
         if (index + 1 > size) {
-            size*=2;
-            char* temp = realloc(buffer, size);
-            if (temp == NULL) {
-                free(buffer);
-                buffer = NULL;
-                return NULL;
-            }
+            size *= 2;
+            char *temp = realloc(buffer, size);
+            if (temp == NULL) {free(buffer);buffer = NULL;return NULL;}
             buffer = temp;
         }
-        *(buffer + index++) = (char)current;
+        *(buffer + index++) = (char) current;
     }
     *(buffer + index) = '\0';
     return buffer;
 }
 
 void newLine() {
-    row++; symbol = 0;
-    text = realloc(text, memory_allocated += sizeof(char*));
+    row++;
+    symbol = 0;
+    text = realloc(text, memory_allocated += sizeof(char *));
     printf("New line started\n\n");
 }
 
 void save() {
-
 }
 
 void load() {
-
 }
 
-void print() {
-    for (int i = 0; i <= row; i++) printf("%s\n\n", *(text + i));
-}
+void print() {for (int i = 0; i <= row; i++) printf("%s\n\n", *(text + i));}
 
-void insert(const int* ROW, const int* SYMBOL) {
+void insert(const int *ROW, const int *SYMBOL) {
     if (ROW == NULL || SYMBOL == NULL) return;
-    int temp; while ((temp = getchar()) != '\n' && temp != EOF){} //Flush input buffer
-    char* input = readInput();
-    int length = 0; while (input[length] != '\0') length++; //Count input length
+
+    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {} //Flush input buffer
+
+    char *input = readInput();
+
+    int length = 0; while (*(input + length) != '\0') length++; //Count input length
+
     if (*ROW == row && *SYMBOL == symbol && symbol == 0) *(text + *ROW) = malloc(length);
-    else *(text + *ROW) = realloc(*(text + *ROW), memory_allocated+=length);
-    for (int i = 0; i < length; i++) *(*(text + *ROW) + *SYMBOL + i) = *(input + i);
-    symbol+=length;
+    else *(text + *ROW) = realloc(*(text + *ROW), memory_allocated += length);
+
+    if (*ROW == row && *SYMBOL == symbol) for (int i = 0; i < length; i++) *(*(text + *ROW) + *SYMBOL + i) = *(input + i);
+    else{
+        for (int i = strlen(*(text + *ROW)); i >= *SYMBOL; i--)
+            *(*(text + *ROW) + length + i) = *(*(text + *ROW) + i);
+        for (int i = 0; i < length; i++)
+            *(*(text + *ROW) + *SYMBOL + i) = *(input + i);
+    }
+
+    symbol += length;
     free(input);
     input = NULL;
     printf("\n");
 }
 
 void search() {
-
 }
 
 
@@ -106,11 +111,10 @@ int main(void) {
                 printf("Choose row and index [%%d %%d]: ");
                 int r = row;
                 int s = symbol;
-                while (scanf("%d %d", &r, &s) != 2) {
-                    printf("Invalid input, try again");
-                }
-                printf("Enter text to insert: ");
-                insert(&r, &s);
+                if (scanf(" %d %d", &r, &s) == 2) {
+                    printf("Enter text to insert: ");
+                    insert(&r, &s);
+                } else printf("Invalid input, try again\n");
                 break;
             case '7':
                 search();
