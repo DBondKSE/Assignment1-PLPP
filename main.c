@@ -1,7 +1,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #define true 1
 #define false 0
 
@@ -37,7 +36,9 @@ char* readInput() {
 }
 
 void newLine() {
-    row++; symbol = 0; text = realloc(text, memory_allocated += sizeof(char*)); *(text + row) = "\0"; printf("New line started\n\n");
+    row++; symbol = 0;
+    text = realloc(text, memory_allocated += sizeof(char*));
+    printf("New line started\n\n");
 }
 
 void save() {
@@ -49,26 +50,17 @@ void load() {
 }
 
 void print() {
-    for (int i = 0; i <= row; i++) {
-        printf("%s\n\n", *(text + i));
-    }
+    for (int i = 0; i <= row; i++) printf("%s\n\n", *(text + i));
 }
 
 void insert(const int* ROW, const int* SYMBOL) {
-    if (ROW == NULL || SYMBOL == NULL) {
-        printf("Choose row and index: ");
-        //TODO: parse input position
-        printf("Enter text to insert: ");
-        return;
-    }
+    if (ROW == NULL || SYMBOL == NULL) return;
     int temp; while ((temp = getchar()) != '\n' && temp != EOF){} //Flush input buffer
     char* input = readInput();
     int length = 0; while (input[length] != '\0') length++; //Count input length
     if (*ROW == row && *SYMBOL == symbol && symbol == 0) *(text + *ROW) = malloc(length);
     else *(text + *ROW) = realloc(*(text + *ROW), memory_allocated+=length);
-    // char** swap = realloc(text, memory_allocated+=length);
-    // if (swap != NULL) text = swap; else return;
-    for (int i = 0; i < length; i++) *(*(text + *ROW) + *SYMBOL + i) = *(input + i); //*(text + memory_allocated - 1 - length+i) = ;
+    for (int i = 0; i < length; i++) *(*(text + *ROW) + *SYMBOL + i) = *(input + i);
     symbol+=length;
     free(input);
     input = NULL;
@@ -111,7 +103,14 @@ int main(void) {
                 print();
                 break;
             case '6':
-                insert(NULL, NULL);
+                printf("Choose row and index [%%d %%d]: ");
+                int r = row;
+                int s = symbol;
+                while (scanf("%d %d", &r, &s) != 2) {
+                    printf("Invalid input, try again");
+                }
+                printf("Enter text to insert: ");
+                insert(&r, &s);
                 break;
             case '7':
                 search();
