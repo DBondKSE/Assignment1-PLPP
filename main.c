@@ -40,9 +40,56 @@ void newLine() {
 }
 
 void save() {
+    FILE* file;
+    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {} //Flush input buffer
+    file = fopen(readInput(), "w");
+    if (file != NULL)
+    {
+        for (int i = 0; i <= row; i++) {
+            fputs(*(text + i), file);
+            fputc('\n', file);
+        }
+        fclose(file);
+        printf("Text has been saved successfully\n");
+    }
 }
 
 void load() {
+    FILE* file;
+    int row_counter = 0;
+    int temp; while ((temp = getchar()) != '\n' && temp != EOF) {} //Flush input buffer
+    file = fopen(readInput(), "r");
+    if (file == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
+
+    free(text);
+    text = NULL;
+    int alloc = sizeof(char*);
+    text = malloc(alloc);
+
+    int size = 10;
+    int count = 0;
+    char* buf = malloc(size);
+    char ch;
+    while ((ch = (char)fgetc(file)) != EOF) {
+        if (count >= size) buf = realloc(buf, size*=2);
+        if (ch == '\n') {
+            *(buf + count) = '\0';
+            row = row_counter;
+            symbol = count;
+            *(text + row_counter++) = buf;
+            buf = malloc(size = 10);
+            count = 0;
+            text = realloc(text, alloc+=sizeof(char*));
+        } else {
+            *(buf + count++) = ch;
+        }
+    }
+    fclose(file);
+    printf("Text has been loaded successfully\n");
 }
 
 void print() {for (int i = 0; i <= row; i++) printf("%s\n\n", *(text + i));}
@@ -99,9 +146,11 @@ int main(void) {
                 newLine();
                 break;
             case '3':
+                printf("Enter the file name for saving: ");
                 save();
                 break;
             case '4':
+                printf("Enter the file name for loading: ");
                 load();
                 break;
             case '5':
