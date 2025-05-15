@@ -1,13 +1,14 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define true 1
 #define false 0
 
-char* text;
+char** text;
 int row = 0;
 int symbol = 0;
-int memory_allocated = 0;
+int memory_allocated = 1;
 
 char* readInput() {
     int size = 10;
@@ -36,7 +37,7 @@ char* readInput() {
 }
 
 void newLine() {
-    row++; symbol = 0;
+    row++; symbol = 0; text = realloc(text, memory_allocated += sizeof(char*)); *(text + row) = "\0"; printf("New line started\n\n");
 }
 
 void save() {
@@ -48,21 +49,26 @@ void load() {
 }
 
 void print() {
-    printf("%s\n\n",text);
+    for (int i = 0; i <= row; i++) {
+        printf("%s\n\n", *(text + i));
+    }
 }
 
 void insert(const int* ROW, const int* SYMBOL) {
-    if (ROW == NULL && SYMBOL == NULL) {
+    if (ROW == NULL || SYMBOL == NULL) {
         printf("Choose row and index: ");
         //TODO: parse input position
         printf("Enter text to insert: ");
+        return;
     }
-
     int temp; while ((temp = getchar()) != '\n' && temp != EOF){} //Flush input buffer
     char* input = readInput();
     int length = 0; while (input[length] != '\0') length++; //Count input length
-    text = realloc(text, memory_allocated+=length);
-    for (int i = 0; i < length; i++) *(text + memory_allocated-length+i) = *(input + i);
+    if (*ROW == row && *SYMBOL == symbol && symbol == 0) *(text + *ROW) = malloc(length);
+    else *(text + *ROW) = realloc(*(text + *ROW), memory_allocated+=length);
+    // char** swap = realloc(text, memory_allocated+=length);
+    // if (swap != NULL) text = swap; else return;
+    for (int i = 0; i < length; i++) *(*(text + *ROW) + *SYMBOL + i) = *(input + i); //*(text + memory_allocated - 1 - length+i) = ;
     symbol+=length;
     free(input);
     input = NULL;
@@ -78,40 +84,48 @@ int main(void) {
     system("clear");
     text = malloc(memory_allocated);
     while (true) {
-        printf("> Choose the command:\n");
-        int command;
-        //TODO: bug with letter input instead of number
-        scanf("%d", &command);
+        printf("> Choose the command ([h] - help):\n");
+        char command;
+        scanf(" %c", &command);
         system("clear");
         switch (command) {
-            case 0:
+            case '0':
                 free(text);
                 text = NULL;
+                printf("-----PROGRAM END-----");
                 return 143;
-            case 1:
+            case '1':
                 printf("Enter text to append: ");
                 insert(&row, &symbol);
                 break;
-            case 2:
+            case '2':
                 newLine();
                 break;
-            case 3:
+            case '3':
                 save();
                 break;
-            case 4:
+            case '4':
                 load();
                 break;
-            case 5:
+            case '5':
                 print();
                 break;
-            case 6:
+            case '6':
                 insert(NULL, NULL);
                 break;
-            case 7:
+            case '7':
                 search();
                 break;
             default:
-                printf("Please, enter valid command number\n");
+                printf("Valid command numbers:\n");
+                printf("[0] - exit\n");
+                printf("[1] - append\n");
+                printf("[2] - new line\n");
+                printf("[3] - save\n");
+                printf("[4] - load\n");
+                printf("[5] - print\n");
+                printf("[6] - insert\n");
+                printf("[7] - search\n");
                 break;
         }
     }
