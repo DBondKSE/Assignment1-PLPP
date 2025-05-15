@@ -24,19 +24,19 @@ char* readInput() {
             char* temp = realloc(buffer, size);
             if (temp == NULL) {
                 free(buffer);
+                buffer = NULL;
                 return NULL;
             }
             buffer = temp;
         }
-        buffer[index++] = current;
+        *(buffer + index++) = (char)current;
     }
-    buffer[index] = '\0';
-
+    *(buffer + index) = '\0';
     return buffer;
 }
 
 void newLine() {
-
+    row++; symbol = 0;
 }
 
 void save() {
@@ -62,9 +62,10 @@ void insert(const int* ROW, const int* SYMBOL) {
     char* input = readInput();
     int length = 0; while (input[length] != '\0') length++; //Count input length
     text = realloc(text, memory_allocated+=length);
-    for (int i = 0; i < length; i++) text[memory_allocated-length+i] = input[i];
+    for (int i = 0; i < length; i++) *(text + memory_allocated-length+i) = *(input + i);
     symbol+=length;
     free(input);
+    input = NULL;
     printf("\n");
 }
 
@@ -85,6 +86,7 @@ int main(void) {
         switch (command) {
             case 0:
                 free(text);
+                text = NULL;
                 return 143;
             case 1:
                 printf("Enter text to append: ");
